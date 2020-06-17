@@ -1,0 +1,6 @@
+model: model/3_18/cn2en_save-model_step_370000.pt
+type: cn2en
+tokenize_url: http://9.141.138.117/tokenize # V1.6.0 (https://git.code.oa.com/prservice/qqseg)
+tokenize_mode: CRF|POS|CUS|ADD|ASCII_LM|ASCII_LM_PINYIN
+codes_file: ./model/codes_file.cn
+trans_dict_file: ./model/slang-translation.utf8.txt
