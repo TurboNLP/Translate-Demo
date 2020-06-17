@@ -133,7 +133,7 @@ class BatchPredictor:
 
 
 
-def get_onmt_translator(cfg: TokenProcessor, with_quantize_dynamic: bool):
+def get_onmt_translator(cfg: TokenProcessor, use_gpu : bool, with_quantize_dynamic: bool):
     class DummyOutFile:
         def write(self, msg):
             pass
@@ -142,6 +142,8 @@ def get_onmt_translator(cfg: TokenProcessor, with_quantize_dynamic: bool):
             pass
 
     opt = Options()
+    opt.cuda = True if use_gpu else False
+    opt.gpu = 0 if use_gpu else -1
     scorer = onmt.translate.GNMTGlobalScorer.from_opt(opt)
     fields, model, model_opt = load_test_model(opt, cfg.model)
     if with_quantize_dynamic:
