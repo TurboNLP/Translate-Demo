@@ -6,6 +6,7 @@
 [Tencent/TurboTransformers](https://github.com/Tencent/TurboTransformers "TurboTransformers")
 
 #### Usage
+```
 mkdir -p model/3_18
 # download a pretrained translation model in that dir
 # https://pan.baidu.com/s/1iWAtd4gYt7l2f4rXZoucxQ
