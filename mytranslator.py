@@ -19,6 +19,7 @@ from onmt.utils.alignment import extract_alignment, build_align_pharaoh
 from onmt.modules.copy_generator import collapse_copy_scores
 
 import turbo_transformers
+import global_timer as global_timer
 
 show_debug_detail = False
 show_profile_detail = False
@@ -623,30 +624,21 @@ class Translator(object):
         )
         toc = time.perf_counter()
         turbo_docoder_time = toc - tic
+        global_timer.turbo_timer += turbo_docoder_time
+        global_timer.torch_timer += onmt_docoder_time
+        # check correctness
+        assert(torch.max(torch.abs(dec_out - turbo_dec_out) < 1e-3))
+        assert(torch.max(torch.abs(dec_attn["std"] - turbo_dec_attn["std"]) < 1e-3))
 
-        print("onmt time: ", onmt_docoder_time, " turbo time: ", turbo_docoder_time)
-        print("dec_out diff: ", torch.max(
-                    torch.abs(dec_out -
-                              turbo_dec_out)))
-        print("attn diff: ", torch.max(
-                    torch.abs(dec_attn["std"] -
-                              turbo_dec_attn["std"])))   
-                           
-        # if not (torch.max(torch.abs(dec_out - turbo_dec_out)) < 1e-3):
-        #     layer_cache = self.model.decoder.state["cache"]["layer_0"]
-        #     for k, v in layer_cache.items():
-        #         print(k, v.size())
-        #     raise "test failed"
-        # else:
-        #     layer_cache = self.model.decoder.state["cache"]
-        #     for name, elem in layer_cache.items():
-        #         if "layer" in name:
-        #             for k, v in elem.items():
-        #                 print(k, v.size())
-        # assert(
-        #         torch.max(
+        # print("onmt time: ", onmt_docoder_time, " turbo time: ", turbo_docoder_time)
+        # print("dec_out diff: ", torch.max(
+        #             torch.abs(dec_out -
+        #                       turbo_dec_out)))
+        # print("attn diff: ", torch.max(
         #             torch.abs(dec_attn["std"] -
-        #                       turbo_dec_attn["std"])) < 1e-3)
+        #                       turbo_dec_attn["std"])))   
+                           
+        
         tic = time.perf_counter()
         # Generator forward.
         if not self.copy_attn:

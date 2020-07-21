@@ -30,6 +30,7 @@ from subEntity_new import E2V
 import token_process_tools
 from contextlib import contextmanager
 from contexttimer import Timer
+import global_timer as global_timer
 
 debug = str2bool.str2bool(os.getenv("DEBUG", "0"), raise_exc=True)
 with_quantize_dynamic = str2bool.str2bool(os.getenv("WITH_QUANTIZE_DYNAMIC",
@@ -83,10 +84,15 @@ def test_onmt(cfg: token_process_tools.TokenProcessor,
 
     onmt_trans = PredictWithONMT(cfg, onmt_trans)
     onmt_results = []
-    with Timer() as onmt_time:
-        for sent in sents:
-            onmt_result = onmt_trans.trans(sent)[0]['result']
-            onmt_results.append(onmt_result)
+    with open("trans_perf.txt", "w") as of:
+        with Timer() as onmt_time:
+            for sent in sents:
+                onmt_result = onmt_trans.trans(sent)[0]['result']
+                print(f"turbo decoder : {global_timer.turbo_timer}, torch decoder: {global_timer.torch_timer}")
+                of.write(f"{len(sent)}, {global_timer.turbo_timer}, {global_timer.torch_timer}\n")
+                global_timer.turbo_timer = 0.
+                global_timer.torch_timer = 0.
+                onmt_results.append(onmt_result)
     print(f"onmt time consume:{onmt_time.elapsed}")
     return onmt_results
 
@@ -104,8 +110,9 @@ if __name__ == "__main__":
 
     sents = read_from_file("./sents_cn_seg_500.txt")
     sents = list(sents)
-    sents = sents[0:10]
-
+    sents = sents[0:100]
+    for item in sents:
+        print(len(item), item)
     config_file = './model/cn2en_config.yml'
     cfg = token_process_tools.TokenProcessor(config_file)
 
