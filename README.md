@@ -16,4 +16,7 @@ pip install -r requirements.txt
 python ./test_predict_local.py [--use_gpu]
 ```
 
+#### Known Issues
+OpenNMT-py==1.1.0 will throw errors on some test cases. Upgrade it tp 1.2.0.
+
 

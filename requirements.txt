@@ -4,3 +4,4 @@ subword_nmt
 zhconv
 docopt
 contexttimer
+OpenNMT-py==1.2.0
